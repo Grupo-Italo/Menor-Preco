@@ -2,14 +2,17 @@ import { Header } from "../components/Header"
 import { Listing } from "../components/Listing"
 import { Metrics } from "../components/Metrics"
 import { Search } from "../components/Search"
+import Box from '@mui/material/Box'
 
 function SearchPrices() {
     return (
         <>
             <Header />
-            <Search />
-            <Metrics />
-            <Listing />
+            <Box sx={{ mt: 10, px: 2 }}>
+                <Search />
+                <Metrics />
+                <Listing />
+            </Box>
         </>
     )
 }
