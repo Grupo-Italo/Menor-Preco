@@ -3,15 +3,18 @@ import { Listing } from "../components/Listing"
 import { Metrics } from "../components/Metrics"
 import { Search } from "../components/Search"
 import Box from '@mui/material/Box'
+import { useState } from 'react'
 
 function SearchPrices() {
+    const [productsData, setProductsData] = useState(null);
+
     return (
         <>
             <Header />
             <Box sx={{ mt: 10, px: 2 }}>
-                <Search />
+                <Search onDataFetched={setProductsData} />
                 <Metrics />
-                <Listing />
+                <Listing data={productsData} />
             </Box>
         </>
     )

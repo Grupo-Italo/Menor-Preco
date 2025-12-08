@@ -5,11 +5,12 @@ import { Button, Box } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-export function Search() {
+export function Search({ onDataFetched }) {
     const [selectedLocal, setSelectedLocal] = useState(null);
     const [codigoLocalidade, setCodigoLocalidade] = useState('');
     const [gtin, setGtin] = useState('');
     const [shouldFetch, setShouldFetch] = useState(false);
+    const [dataFetched, setDataFetched] = useState(null);
 
     const handleLocalChange = (event, newValue) => {
         setSelectedLocal(newValue);
@@ -33,6 +34,12 @@ export function Search() {
         enabled: shouldFetch && !!codigoLocalidade && !!gtin,
     });
 
+    useEffect(() => {
+        if (data && onDataFetched) {
+            onDataFetched(data);
+        }
+    }, [data, onDataFetched]);
+
     const handleBuscar = () => {
         if (!selectedLocal || !gtin) {
             alert('Por favor, preencha o local e o GTIN');
@@ -45,7 +52,7 @@ export function Search() {
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
             {isLoading && <Box sx={{ width: '100%', color: 'white' }}>Carregando...</Box>}
             {error && <Box sx={{ width: '100%', color: 'red' }}>Erro ao buscar dados. Tente novamente.</Box>}
-            
+
             <Autocomplete
                 disablePortal
                 options={baselocais}
