@@ -84,11 +84,11 @@ src/
 
 ## 👥 Contribuidores
 
-- Grupo Ítalo
+- Patrick Souza
 
 ## 📄 Licença
 
-Este projeto é de código aberto e está disponível para uso educacional e comercial.
+Este projeto é restrito aos integrantes do Grupo Ítalo
 
 ---
 
