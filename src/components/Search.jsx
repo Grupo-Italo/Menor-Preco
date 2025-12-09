@@ -3,6 +3,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { Button, Box } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useApi } from '../hooks/useApi';
+import { inputStyles, autocompleteStyles, readOnlyInputStyles } from '../styles/inputStyles';
 
 export function Search({ onDataFetched }) {
     const [selectedCidade, setSelectedCidade] = useState(null);
@@ -111,32 +112,7 @@ export function Search({ onDataFetched }) {
                 isOptionEqualToValue={(option, value) => option.cidade === value.cidade}
                 onOpen={() => setOpenAutocomplete(true)}
                 onClose={() => setOpenAutocomplete(false)}
-                sx={{ 
-                    minWidth: 250,
-                    flex: 1,
-                    '& .MuiOutlinedInput-root': {
-                        backgroundColor: '#2c2c2c',
-                        color: 'white',
-                        '& fieldset': {
-                            borderColor: '#444',
-                        },
-                        '&:hover fieldset': {
-                            borderColor: '#8ab4f8',
-                        },
-                        '&.Mui-focused fieldset': {
-                            borderColor: '#8ab4f8',
-                        }
-                    },
-                    '& .MuiInputLabel-root': {
-                        color: '#9e9e9e',
-                        '&.Mui-focused': {
-                            color: '#8ab4f8',
-                        }
-                    },
-                    '& .MuiAutocomplete-popupIndicator': {
-                        color: '#9e9e9e',
-                    }
-                }}
+                sx={autocompleteStyles}
                 value={selectedCidade}
                 onChange={handleCidadeChange}
                 renderInput={(params) => <TextField {...params} label="Cidade" />}
@@ -149,32 +125,7 @@ export function Search({ onDataFetched }) {
                 loading={loadingBases}
                 getOptionLabel={(option) => option.nome || ''}
                 isOptionEqualToValue={(option, value) => option.geohash === value.geohash}
-                sx={{ 
-                    minWidth: 250,
-                    flex: 1,
-                    '& .MuiOutlinedInput-root': {
-                        backgroundColor: '#2c2c2c',
-                        color: 'white',
-                        '& fieldset': {
-                            borderColor: '#444',
-                        },
-                        '&:hover fieldset': {
-                            borderColor: '#8ab4f8',
-                        },
-                        '&.Mui-focused fieldset': {
-                            borderColor: '#8ab4f8',
-                        }
-                    },
-                    '& .MuiInputLabel-root': {
-                        color: '#9e9e9e',
-                        '&.Mui-focused': {
-                            color: '#8ab4f8',
-                        }
-                    },
-                    '& .MuiAutocomplete-popupIndicator': {
-                        color: '#9e9e9e',
-                    }
-                }}
+                sx={autocompleteStyles}
                 value={selectedBase}
                 onChange={handleBaseChange}
                 renderInput={(params) => <TextField {...params} label="Base" />}
@@ -186,29 +137,7 @@ export function Search({ onDataFetched }) {
                 value={gtin}
                 onChange={handleGtinChange}
                 disabled={!!termoProduto}
-                sx={{ 
-                    minWidth: 200,
-                    flex: 1,
-                    '& .MuiOutlinedInput-root': {
-                        backgroundColor: '#2c2c2c',
-                        color: 'white',
-                        '& fieldset': {
-                            borderColor: '#444',
-                        },
-                        '&:hover fieldset': {
-                            borderColor: '#8ab4f8',
-                        },
-                        '&.Mui-focused fieldset': {
-                            borderColor: '#8ab4f8',
-                        }
-                    },
-                    '& .MuiInputLabel-root': {
-                        color: '#9e9e9e',
-                        '&.Mui-focused': {
-                            color: '#8ab4f8',
-                        }
-                    }
-                }}
+                sx={{ ...inputStyles, minWidth: 200 }}
             />
 
             <TextField
@@ -217,29 +146,7 @@ export function Search({ onDataFetched }) {
                 value={termoProduto}
                 onChange={handleTermoChange}
                 disabled={!!gtin}
-                sx={{ 
-                    minWidth: 250,
-                    flex: 1,
-                    '& .MuiOutlinedInput-root': {
-                        backgroundColor: '#2c2c2c',
-                        color: 'white',
-                        '& fieldset': {
-                            borderColor: '#444',
-                        },
-                        '&:hover fieldset': {
-                            borderColor: '#8ab4f8',
-                        },
-                        '&.Mui-focused fieldset': {
-                            borderColor: '#8ab4f8',
-                        }
-                    },
-                    '& .MuiInputLabel-root': {
-                        color: '#9e9e9e',
-                        '&.Mui-focused': {
-                            color: '#8ab4f8',
-                        }
-                    }
-                }}
+                sx={inputStyles}
             />
 
             <TextField
@@ -249,20 +156,7 @@ export function Search({ onDataFetched }) {
                 InputProps={{
                     readOnly: true,
                 }}
-                sx={{ 
-                    minWidth: 200,
-                    flex: 1,
-                    '& .MuiOutlinedInput-root': {
-                        backgroundColor: '#2c2c2c',
-                        color: '#9e9e9e',
-                        '& fieldset': {
-                            borderColor: '#444',
-                        }
-                    },
-                    '& .MuiInputLabel-root': {
-                        color: '#9e9e9e',
-                    }
-                }}
+                sx={readOnlyInputStyles}
             />
 
             <Button 
