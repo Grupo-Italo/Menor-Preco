@@ -9,6 +9,7 @@ export function Search({ onDataFetched }) {
     const [selectedBase, setSelectedBase] = useState(null);
     const [codigoLocalidade, setCodigoLocalidade] = useState('');
     const [gtin, setGtin] = useState('');
+    const [termoProduto, setTermoProduto] = useState('');
     const [shouldFetch, setShouldFetch] = useState(false);
     const [openAutocomplete, setOpenAutocomplete] = useState(false);
     const [shouldFetchBases, setShouldFetchBases] = useState(false);
@@ -32,8 +33,12 @@ export function Search({ onDataFetched }) {
         'menor-preco',
         'https://menorpreco.notaparana.pr.gov.br/api/v1/produtos',
         {
-            enabled: shouldFetch && !!codigoLocalidade && !!gtin,
-            params: { local: codigoLocalidade, gtin }
+            enabled: shouldFetch && !!codigoLocalidade && (!!gtin || !!termoProduto),
+            params: { 
+                local: codigoLocalidade, 
+                ...(gtin && { gtin }),
+                ...(termoProduto && { termo: termoProduto })
+            }
         }
     );
 
@@ -54,7 +59,19 @@ export function Search({ onDataFetched }) {
     };
 
     const handleGtinChange = (event) => {
-        setGtin(event.target.value);
+        const value = event.target.value;
+        setGtin(value);
+        if (value) {
+            setTermoProduto('');
+        }
+    };
+
+    const handleTermoChange = (event) => {
+        const value = event.target.value;
+        setTermoProduto(value);
+        if (value) {
+            setGtin('');
+        }
     };
 
     useEffect(() => {
@@ -64,15 +81,25 @@ export function Search({ onDataFetched }) {
     }, [data, onDataFetched]);
 
     const handleBuscar = () => {
-        if (!selectedCidade || !selectedBase || !gtin) {
-            alert('Por favor, preencha a cidade, base e o GTIN');
+        if (!selectedCidade || !selectedBase) {
+            alert('Por favor, preencha a cidade e a base');
+            return;
+        }
+        if (!gtin && !termoProduto) {
+            alert('Por favor, preencha o GTIN ou o nome do produto');
             return;
         }
         setShouldFetch(true);
     };
 
     return (
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+        <Box sx={{ 
+            display: 'flex', 
+            gap: 2, 
+            alignItems: 'flex-end', 
+            flexWrap: 'wrap',
+            padding: 2
+        }}>
             {isLoading && <Box sx={{ width: '100%', color: 'white' }}>Carregando...</Box>}
             {error && <Box sx={{ width: '100%', color: 'red' }}>Erro ao buscar dados. Tente novamente.</Box>}
 
@@ -84,10 +111,30 @@ export function Search({ onDataFetched }) {
                 isOptionEqualToValue={(option, value) => option.cidade === value.cidade}
                 onOpen={() => setOpenAutocomplete(true)}
                 onClose={() => setOpenAutocomplete(false)}
-                sx={{
-                    width: 300,
+                sx={{ 
+                    minWidth: 250,
+                    flex: 1,
                     '& .MuiOutlinedInput-root': {
-                        backgroundColor: 'white',
+                        backgroundColor: '#2c2c2c',
+                        color: 'white',
+                        '& fieldset': {
+                            borderColor: '#444',
+                        },
+                        '&:hover fieldset': {
+                            borderColor: '#8ab4f8',
+                        },
+                        '&.Mui-focused fieldset': {
+                            borderColor: '#8ab4f8',
+                        }
+                    },
+                    '& .MuiInputLabel-root': {
+                        color: '#9e9e9e',
+                        '&.Mui-focused': {
+                            color: '#8ab4f8',
+                        }
+                    },
+                    '& .MuiAutocomplete-popupIndicator': {
+                        color: '#9e9e9e',
                     }
                 }}
                 value={selectedCidade}
@@ -102,45 +149,134 @@ export function Search({ onDataFetched }) {
                 loading={loadingBases}
                 getOptionLabel={(option) => option.nome || ''}
                 isOptionEqualToValue={(option, value) => option.geohash === value.geohash}
-                sx={{
-                    width: 300,
+                sx={{ 
+                    minWidth: 250,
+                    flex: 1,
                     '& .MuiOutlinedInput-root': {
-                        backgroundColor: 'white',
+                        backgroundColor: '#2c2c2c',
+                        color: 'white',
+                        '& fieldset': {
+                            borderColor: '#444',
+                        },
+                        '&:hover fieldset': {
+                            borderColor: '#8ab4f8',
+                        },
+                        '&.Mui-focused fieldset': {
+                            borderColor: '#8ab4f8',
+                        }
+                    },
+                    '& .MuiInputLabel-root': {
+                        color: '#9e9e9e',
+                        '&.Mui-focused': {
+                            color: '#8ab4f8',
+                        }
+                    },
+                    '& .MuiAutocomplete-popupIndicator': {
+                        color: '#9e9e9e',
                     }
                 }}
                 value={selectedBase}
                 onChange={handleBaseChange}
                 renderInput={(params) => <TextField {...params} label="Base" />}
             />
+
             <TextField
-                id="outlined-basic"
                 label="Gtin"
                 variant="outlined"
                 value={gtin}
                 onChange={handleGtinChange}
-                sx={{
-                    width: 300,
+                disabled={!!termoProduto}
+                sx={{ 
+                    minWidth: 200,
+                    flex: 1,
                     '& .MuiOutlinedInput-root': {
-                        backgroundColor: 'white',
+                        backgroundColor: '#2c2c2c',
+                        color: 'white',
+                        '& fieldset': {
+                            borderColor: '#444',
+                        },
+                        '&:hover fieldset': {
+                            borderColor: '#8ab4f8',
+                        },
+                        '&.Mui-focused fieldset': {
+                            borderColor: '#8ab4f8',
+                        }
+                    },
+                    '& .MuiInputLabel-root': {
+                        color: '#9e9e9e',
+                        '&.Mui-focused': {
+                            color: '#8ab4f8',
+                        }
                     }
                 }}
             />
+
             <TextField
-                id="filled-basic"
+                label="Nome do Produto"
+                variant="outlined"
+                value={termoProduto}
+                onChange={handleTermoChange}
+                disabled={!!gtin}
+                sx={{ 
+                    minWidth: 250,
+                    flex: 1,
+                    '& .MuiOutlinedInput-root': {
+                        backgroundColor: '#2c2c2c',
+                        color: 'white',
+                        '& fieldset': {
+                            borderColor: '#444',
+                        },
+                        '&:hover fieldset': {
+                            borderColor: '#8ab4f8',
+                        },
+                        '&.Mui-focused fieldset': {
+                            borderColor: '#8ab4f8',
+                        }
+                    },
+                    '& .MuiInputLabel-root': {
+                        color: '#9e9e9e',
+                        '&.Mui-focused': {
+                            color: '#8ab4f8',
+                        }
+                    }
+                }}
+            />
+
+            <TextField
                 label="Código de localidade"
-                variant="filled"
+                variant="outlined"
                 value={codigoLocalidade}
                 InputProps={{
                     readOnly: true,
                 }}
-                sx={{
-                    width: 300,
-                    '& .MuiFilledInput-root': {
-                        backgroundColor: 'white',
+                sx={{ 
+                    minWidth: 200,
+                    flex: 1,
+                    '& .MuiOutlinedInput-root': {
+                        backgroundColor: '#2c2c2c',
+                        color: '#9e9e9e',
+                        '& fieldset': {
+                            borderColor: '#444',
+                        }
+                    },
+                    '& .MuiInputLabel-root': {
+                        color: '#9e9e9e',
                     }
                 }}
             />
-            <Button variant="contained" onClick={handleBuscar}>Executar busca</Button>
+
+            <Button 
+                variant="contained" 
+                onClick={handleBuscar}
+                sx={{
+                    height: 56,
+                    minWidth: 150,
+                    textTransform: 'none',
+                    fontSize: '1rem'
+                }}
+            >
+                Executar busca
+            </Button>
         </Box>
     );
 }

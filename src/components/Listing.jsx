@@ -45,6 +45,7 @@ export function Listing({ data }) {
         loja: item.estabelecimento.nm_emp,
         preco: item.valor,
         endereco: `${item.estabelecimento.nm_logr}, ${item.estabelecimento.nr_logr} - ${item.estabelecimento.bairro}`,
+        distancia: `${item.distkm}m`,
         cidade: item.estabelecimento.mun
     }));
 
@@ -52,6 +53,7 @@ export function Listing({ data }) {
         { field: 'loja', headerName: 'Loja', width: 400 },
         { field: 'preco', headerName: 'Preço', width: 120 },
         { field: 'endereco', headerName: 'Endereço', width: 400 },
+        { field: 'distancia', headerName: 'Distância (m)', width: 300 },
         { field: 'cidade', headerName: 'Cidade/UF', width: 180 }
     ];
 
