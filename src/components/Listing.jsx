@@ -18,10 +18,10 @@ export function Listing({ data }) {
 
     const columns = [
         { field: 'loja', headerName: 'Loja', width: 400 },
-        { field: 'preco', headerName: 'Preço', width: 120 },
+        { field: 'preco', headerName: 'Preço', width: 150 },
         { field: 'endereco', headerName: 'Endereço', width: 400 },
         { field: 'distancia', headerName: 'Distância (m)', width: 300 },
-        { field: 'cidade', headerName: 'Cidade/UF', width: 300 }
+        { field: 'cidade', headerName: 'Cidade/UF', width: 260 }
     ];
 
     return (

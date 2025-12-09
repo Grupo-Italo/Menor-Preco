@@ -1,8 +1,8 @@
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import { Button, Box } from '@mui/material';
+import { Button, Box, Snackbar, Alert } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { useApi } from '../hooks/useApi';
+import { useApi, useApiMutation } from '../hooks/useApi';
 import { inputStyles, autocompleteStyles, readOnlyInputStyles } from '../styles/inputStyles';
 
 export function Search({ onDataFetched }) {
@@ -15,16 +15,29 @@ export function Search({ onDataFetched }) {
     const [openAutocomplete, setOpenAutocomplete] = useState(false);
     const [shouldFetchBases, setShouldFetchBases] = useState(false);
 
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+
+    const showSnackbar = (message, severity = 'info') => {
+        setSnackbar({ open: true, message, severity });
+    };
+
+    const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') return;
+        setSnackbar({ ...snackbar, open: false });
+    };
+
+    const saveProductsMutation = useApiMutation('http://localhost:3000/products/bulk');
+
     const { data: cidades = [], isLoading: loadingCidades } = useApi(
         'cidades',
-        'http://localhost:5432/italoBases/cities',
+        'http://localhost:3000/italoBases/cities',
         { enabled: openAutocomplete }
     );
 
     const { data: bases = [], isLoading: loadingBases } = useApi(
         'bases',
-        'http://localhost:5432/italoBases/bases',
-        { 
+        'http://localhost:3000/italoBases/bases',
+        {
             enabled: shouldFetchBases && !!selectedCidade,
             params: { name: selectedCidade?.cidade }
         }
@@ -35,8 +48,8 @@ export function Search({ onDataFetched }) {
         'https://menorpreco.notaparana.pr.gov.br/api/v1/produtos',
         {
             enabled: shouldFetch && !!codigoLocalidade && (!!gtin || !!termoProduto),
-            params: { 
-                local: codigoLocalidade, 
+            params: {
+                local: codigoLocalidade,
                 ...(gtin && { gtin }),
                 ...(termoProduto && { termo: termoProduto })
             }
@@ -47,11 +60,7 @@ export function Search({ onDataFetched }) {
         setSelectedCidade(newValue);
         setSelectedBase(null);
         setCodigoLocalidade('');
-        if (newValue) {
-            setShouldFetchBases(true);
-        } else {
-            setShouldFetchBases(false);
-        }
+        setShouldFetchBases(!!newValue);
     };
 
     const handleBaseChange = (event, newValue) => {
@@ -62,45 +71,63 @@ export function Search({ onDataFetched }) {
     const handleGtinChange = (event) => {
         const value = event.target.value;
         setGtin(value);
-        if (value) {
-            setTermoProduto('');
-        }
+        if (value) setTermoProduto('');
     };
 
     const handleTermoChange = (event) => {
         const value = event.target.value;
         setTermoProduto(value);
-        if (value) {
-            setGtin('');
-        }
+        if (value) setGtin('');
     };
 
     useEffect(() => {
-        if (data && onDataFetched) {
-            onDataFetched(data);
+        const saveProducts = async () => {
+            if (!data || !data.produtos || data.produtos.length === 0) return;
+            if (!gtin) return; // só salva se for busca por GTIN
+            
+            const productsBulk = data.produtos.map(produto => ({
+                gtin: produto.gtin,
+                produto_desc: produto.desc,
+                ncm: produto.ncm,
+                valor: produto.valor,
+                valor_tabela: produto.valor_tabela,
+                datahora: produto.datahora,
+                distkm: produto.distkm,
+                estabelecimento_codigo: produto.estabelecimento.codigo,
+                estabelecimento_nome: produto.estabelecimento.nm_emp,
+                municipio: produto.estabelecimento.mun,
+                uf: produto.estabelecimento.uf,
+                nrdoc: produto.nrdoc,
+                fetched_at: new Date().toISOString()
+            }));
+
+            saveProductsMutation.mutate(productsBulk, {
+                onSuccess: () => showSnackbar('Produtos salvos com sucesso', 'success'),
+                onError: (err) => showSnackbar(`Erro ao salvar produtos: ${err.message}`, 'error')
+            });
+        };
+
+        if (shouldFetch && data && gtin) {
+            saveProducts();
+            if (onDataFetched) onDataFetched(data);
+            setShouldFetch(false); // <--- importantíssimo para não disparar novamente
         }
-    }, [data, onDataFetched]);
+    }, [data, gtin, shouldFetch, onDataFetched, saveProductsMutation]);
 
     const handleBuscar = () => {
         if (!selectedCidade || !selectedBase) {
-            alert('Por favor, preencha a cidade e a base');
+            showSnackbar('Por favor, preencha a cidade e a base', 'warning');
             return;
         }
         if (!gtin && !termoProduto) {
-            alert('Por favor, preencha o GTIN ou o nome do produto');
+            showSnackbar('Por favor, preencha o GTIN ou o nome do produto', 'warning');
             return;
         }
         setShouldFetch(true);
     };
 
     return (
-        <Box sx={{ 
-            display: 'flex', 
-            gap: 2, 
-            alignItems: 'flex-end', 
-            flexWrap: 'wrap',
-            padding: 2
-        }}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end', flexWrap: 'wrap', padding: 2 }}>
             {isLoading && <Box sx={{ width: '100%', color: 'white' }}>Carregando...</Box>}
             {error && <Box sx={{ width: '100%', color: 'red' }}>Erro ao buscar dados. Tente novamente.</Box>}
 
@@ -153,24 +180,28 @@ export function Search({ onDataFetched }) {
                 label="Código de localidade"
                 variant="outlined"
                 value={codigoLocalidade}
-                InputProps={{
-                    readOnly: true,
-                }}
+                InputProps={{ readOnly: true }}
                 sx={readOnlyInputStyles}
             />
 
-            <Button 
-                variant="contained" 
+            <Button
+                variant="contained"
                 onClick={handleBuscar}
-                sx={{
-                    height: 56,
-                    minWidth: 150,
-                    textTransform: 'none',
-                    fontSize: '1rem'
-                }}
+                sx={{ height: 56, minWidth: 150, textTransform: 'none', fontSize: '1rem' }}
             >
                 Executar busca
             </Button>
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

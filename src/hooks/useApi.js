@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
 export const useApi = (queryKey, url, options = {}) => {
     const { enabled = true, params = {} } = options;
@@ -18,5 +18,25 @@ export const useApi = (queryKey, url, options = {}) => {
             return response.json();
         },
         enabled,
+    });
+};
+
+export const useApiMutation = (url, options = {}) => {
+    const { method = 'POST' } = options;
+
+    return useMutation({
+        mutationFn: async (data) => {
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+                throw new Error(`Erro ao enviar dados para ${url}`);
+            }
+            return response.json();
+        }
     });
 };
