@@ -48,9 +48,9 @@ export function Metrics({ data }) {
     return (
         <Box sx={{ mt: 3, mb: 3, width: '100%' }}>
             <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
-                <Card sx={{ backgroundColor: '#2c2c2c', color: 'white', flex: 1, minHeight: '120px' }}>
-                    <CardContent>
-                        <Typography variant="subtitle2" sx={{ color: '#8ab4f8', mb: 1 }}>
+                <Card sx={{ backgroundColor: '#2c2c2c', color: 'white', flex: 1 }}>
+                    <CardContent sx={{ py: 1.5 }}>
+                        <Typography variant="subtitle2" sx={{ color: '#8ab4f8', mb: 0.5 }}>
                             Status do Serviço
                         </Typography>
                         <Typography variant="h6" sx={{ color: metricas.statusServico === 'Online' ? '#81c784' : '#e57373' }}>
@@ -59,15 +59,15 @@ export function Metrics({ data }) {
                     </CardContent>
                 </Card>
 
-                <Card sx={{ backgroundColor: '#2c2c2c', color: 'white', flex: 1, minHeight: '120px' }}>
-                    <CardContent>
-                        <Typography variant="subtitle2" sx={{ color: '#8ab4f8', mb: 1 }}>
+                <Card sx={{ backgroundColor: '#2c2c2c', color: 'white', flex: 1 }}>
+                    <CardContent sx={{ py: 1.5 }}>
+                        <Typography variant="subtitle2" sx={{ color: '#8ab4f8', mb: 0.5 }}>
                             Última Consulta
                         </Typography>
-                        <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
+                        <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>
                             Local: {ultimaConsulta.local}
                         </Typography>
-                        <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
+                        <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>
                             Executada em: {ultimaConsulta.executadaEm}
                         </Typography>
                         <Typography variant="caption" sx={{ color: '#9e9e9e' }}>
@@ -76,9 +76,9 @@ export function Metrics({ data }) {
                     </CardContent>
                 </Card>
 
-                <Card sx={{ backgroundColor: '#2c2c2c', color: 'white', flex: 1, minHeight: '120px' }}>
-                    <CardContent>
-                        <Typography variant="subtitle2" sx={{ color: '#8ab4f8', mb: 1 }}>
+                <Card sx={{ backgroundColor: '#2c2c2c', color: 'white', flex: 1 }}>
+                    <CardContent sx={{ py: 1.5 }}>
+                        <Typography variant="subtitle2" sx={{ color: '#8ab4f8', mb: 0.5 }}>
                             Média / Moda
                         </Typography>
                         <Typography variant="h6">
@@ -90,9 +90,9 @@ export function Metrics({ data }) {
                     </CardContent>
                 </Card>
 
-                <Card sx={{ backgroundColor: '#2c2c2c', color: 'white', flex: 1, minHeight: '120px' }}>
-                    <CardContent>
-                        <Typography variant="subtitle2" sx={{ color: '#8ab4f8', mb: 1 }}>
+                <Card sx={{ backgroundColor: '#2c2c2c', color: 'white', flex: 1 }}>
+                    <CardContent sx={{ py: 1.5 }}>
+                        <Typography variant="subtitle2" sx={{ color: '#8ab4f8', mb: 0.5 }}>
                             Menor / Maior
                         </Typography>
                         <Typography variant="body2">
