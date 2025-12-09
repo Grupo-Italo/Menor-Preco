@@ -1,38 +1,61 @@
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import baselocais from '../data/baselocais';
 import { Button, Box } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useApi } from '../hooks/useApi';
 
 export function Search({ onDataFetched }) {
-    const [selectedLocal, setSelectedLocal] = useState(null);
+    const [selectedCidade, setSelectedCidade] = useState(null);
+    const [selectedBase, setSelectedBase] = useState(null);
     const [codigoLocalidade, setCodigoLocalidade] = useState('');
     const [gtin, setGtin] = useState('');
     const [shouldFetch, setShouldFetch] = useState(false);
-    const [dataFetched, setDataFetched] = useState(null);
+    const [openAutocomplete, setOpenAutocomplete] = useState(false);
+    const [shouldFetchBases, setShouldFetchBases] = useState(false);
 
-    const handleLocalChange = (event, newValue) => {
-        setSelectedLocal(newValue);
-        setCodigoLocalidade(newValue ? newValue.local : '');
+    const { data: cidades = [], isLoading: loadingCidades } = useApi(
+        'cidades',
+        'http://localhost:5432/italoBases/cities',
+        { enabled: openAutocomplete }
+    );
+
+    const { data: bases = [], isLoading: loadingBases } = useApi(
+        'bases',
+        'http://localhost:5432/italoBases/bases',
+        { 
+            enabled: shouldFetchBases && !!selectedCidade,
+            params: { name: selectedCidade?.cidade }
+        }
+    );
+
+    const { data, isLoading, error } = useApi(
+        'menor-preco',
+        'https://menorpreco.notaparana.pr.gov.br/api/v1/produtos',
+        {
+            enabled: shouldFetch && !!codigoLocalidade && !!gtin,
+            params: { local: codigoLocalidade, gtin }
+        }
+    );
+
+    const handleCidadeChange = (event, newValue) => {
+        setSelectedCidade(newValue);
+        setSelectedBase(null);
+        setCodigoLocalidade('');
+        if (newValue) {
+            setShouldFetchBases(true);
+        } else {
+            setShouldFetchBases(false);
+        }
+    };
+
+    const handleBaseChange = (event, newValue) => {
+        setSelectedBase(newValue);
+        setCodigoLocalidade(newValue ? newValue.geohash : '');
     };
 
     const handleGtinChange = (event) => {
         setGtin(event.target.value);
     };
-
-    const { data, isLoading, error } = useQuery({
-        queryKey: ['menor-preco', codigoLocalidade, gtin],
-        queryFn: async () => {
-            const url = `https://menorpreco.notaparana.pr.gov.br/api/v1/produtos?local=${codigoLocalidade}&gtin=${gtin}`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Erro ao buscar dados');
-            }
-            return response.json();
-        },
-        enabled: shouldFetch && !!codigoLocalidade && !!gtin,
-    });
 
     useEffect(() => {
         if (data && onDataFetched) {
@@ -41,8 +64,8 @@ export function Search({ onDataFetched }) {
     }, [data, onDataFetched]);
 
     const handleBuscar = () => {
-        if (!selectedLocal || !gtin) {
-            alert('Por favor, preencha o local e o GTIN');
+        if (!selectedCidade || !selectedBase || !gtin) {
+            alert('Por favor, preencha a cidade, base e o GTIN');
             return;
         }
         setShouldFetch(true);
@@ -55,16 +78,39 @@ export function Search({ onDataFetched }) {
 
             <Autocomplete
                 disablePortal
-                options={baselocais}
+                options={cidades}
+                loading={loadingCidades}
+                getOptionLabel={(option) => option.cidade || ''}
+                isOptionEqualToValue={(option, value) => option.cidade === value.cidade}
+                onOpen={() => setOpenAutocomplete(true)}
+                onClose={() => setOpenAutocomplete(false)}
                 sx={{
                     width: 300,
                     '& .MuiOutlinedInput-root': {
                         backgroundColor: 'white',
                     }
                 }}
-                value={selectedLocal}
-                onChange={handleLocalChange}
-                renderInput={(params) => <TextField {...params} label="Local" />}
+                value={selectedCidade}
+                onChange={handleCidadeChange}
+                renderInput={(params) => <TextField {...params} label="Cidade" />}
+            />
+
+            <Autocomplete
+                disablePortal
+                disabled={!selectedCidade}
+                options={bases}
+                loading={loadingBases}
+                getOptionLabel={(option) => option.nome || ''}
+                isOptionEqualToValue={(option, value) => option.geohash === value.geohash}
+                sx={{
+                    width: 300,
+                    '& .MuiOutlinedInput-root': {
+                        backgroundColor: 'white',
+                    }
+                }}
+                value={selectedBase}
+                onChange={handleBaseChange}
+                renderInput={(params) => <TextField {...params} label="Base" />}
             />
             <TextField
                 id="outlined-basic"
