@@ -178,11 +178,11 @@ export function Search({ onDataFetched }) {
                 onChange={handleRaioChange}
                 sx={{ ...inputStyles, minWidth: 180 }}
             >
-                <MenuItem value={2000}>5000M</MenuItem>
-                <MenuItem value={2000}>2000M</MenuItem>
-                <MenuItem value={1000}>1000M</MenuItem>
-                <MenuItem value={500}>500M</MenuItem>
-                <MenuItem value={100}>100M</MenuItem>
+                <MenuItem value={5000}>5000 Metros</MenuItem>
+                <MenuItem value={2000}>2000 Metros</MenuItem>
+                <MenuItem value={1000}>1000 Metros</MenuItem>
+                <MenuItem value={500}>500 Metros</MenuItem>
+                <MenuItem value={100}>100 Metros</MenuItem>
             </TextField>
 
             <Snackbar
