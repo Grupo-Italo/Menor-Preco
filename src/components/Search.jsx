@@ -50,7 +50,7 @@ export function Search({ onDataFetched }) {
             enabled: shouldFetch && !!codigoLocalidade && (!!gtin || !!termoProduto),
             params: {
                 local: codigoLocalidade,
-                ...(gtin && { gtin }),
+                // ...(gtin && { gtin }),
                 ...(termoProduto && { termo: termoProduto })
             }
         }
@@ -103,16 +103,21 @@ export function Search({ onDataFetched }) {
 
             saveProductsMutation.mutate(productsBulk, {
                 onSuccess: () => showSnackbar('Produtos salvos com sucesso', 'success'),
-                onError: (err) => showSnackbar(`Erro ao salvar produtos: ${err.message}`, 'error')
+                onError: (err) => {
+                    console.error('Erro ao salvar produtos:', err);
+                    showSnackbar(`Erro ao salvar produtos: ${err.message}`, 'error');
+                }
             });
         };
 
-        if (shouldFetch && data && gtin) {
-            saveProducts();
+        if (shouldFetch && data && (gtin || termoProduto)) {
+            if (gtin) {
+                saveProducts();
+            }
             if (onDataFetched) onDataFetched(data);
-            setShouldFetch(false); // <--- importantíssimo para não disparar novamente
+            setShouldFetch(false); 
         }
-    }, [data, gtin, shouldFetch, onDataFetched, saveProductsMutation]);
+    }, [data, gtin, termoProduto, shouldFetch, onDataFetched, saveProductsMutation]);
 
     const handleBuscar = () => {
         if (!selectedCidade || !selectedBase) {

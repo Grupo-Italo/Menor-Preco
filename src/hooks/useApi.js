@@ -26,17 +26,26 @@ export const useApiMutation = (url, options = {}) => {
 
     return useMutation({
         mutationFn: async (data) => {
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            });
-            if (!response.ok) {
-                throw new Error(`Erro ao enviar dados para ${url}`);
+            try {
+                const response = await fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    console.error(`[API Error] Status: ${response.status}`, errorBody);
+                    throw new Error(`Erro ${response.status} ao enviar dados para ${url}: ${errorBody || response.statusText}`);
+                }
+                
+                return response.json();
+            } catch (err) {
+                console.error(`[API Request Error] ${url}:`, err);
+                throw err;
             }
-            return response.json();
         }
     });
 };
