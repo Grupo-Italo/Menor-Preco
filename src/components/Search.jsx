@@ -2,7 +2,7 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { Button, Box, Snackbar, Alert } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { useApi, useApiMutation } from '../hooks/useApi';
+import { useApi } from '../hooks/useApi';
 import { inputStyles, autocompleteStyles, readOnlyInputStyles } from '../styles/inputStyles';
 
 export function Search({ onDataFetched }) {
@@ -26,7 +26,6 @@ export function Search({ onDataFetched }) {
         setSnackbar({ ...snackbar, open: false });
     };
 
-    const saveProductsMutation = useApiMutation('http://localhost:3000/products/bulk');
 
     const { data: cidades = [], isLoading: loadingCidades } = useApi(
         'cidades',
@@ -45,12 +44,12 @@ export function Search({ onDataFetched }) {
 
     const { data, isLoading, error } = useApi(
         'menor-preco',
-        'https://menorpreco.notaparana.pr.gov.br/api/v1/produtos',
+        'http://localhost:3000/nota-parana/search',
         {
             enabled: shouldFetch && !!codigoLocalidade && (!!gtin || !!termoProduto),
             params: {
                 local: codigoLocalidade,
-                // ...(gtin && { gtin }),
+                ...(gtin && { gtin }),
                 ...(termoProduto && { termo: termoProduto })
             }
         }
@@ -81,43 +80,14 @@ export function Search({ onDataFetched }) {
     };
 
     useEffect(() => {
-        const saveProducts = async () => {
-            if (!data || !data.produtos || data.produtos.length === 0) return;
-            if (!gtin) return; // só salva se for busca por GTIN
-            
-            const productsBulk = data.produtos.map(produto => ({
-                gtin: produto.gtin,
-                produto_desc: produto.desc,
-                ncm: produto.ncm,
-                valor: produto.valor,
-                valor_tabela: produto.valor_tabela,
-                datahora: produto.datahora,
-                distkm: produto.distkm,
-                estabelecimento_codigo: produto.estabelecimento.codigo,
-                estabelecimento_nome: produto.estabelecimento.nm_emp,
-                municipio: produto.estabelecimento.mun,
-                uf: produto.estabelecimento.uf,
-                nrdoc: produto.nrdoc,
-                fetched_at: new Date().toISOString()
-            }));
-
-            saveProductsMutation.mutate(productsBulk, {
-                onSuccess: () => showSnackbar('Produtos salvos com sucesso', 'success'),
-                onError: (err) => {
-                    console.error('Erro ao salvar produtos:', err);
-                    showSnackbar(`Erro ao salvar produtos: ${err.message}`, 'error');
-                }
-            });
-        };
-
+        // Quando a busca for concluída (por GTIN ou termo), notificamos o parent
+        // O backend já está persistindo os dados, então o frontend não precisa mais
+        // enviar nada para gravação.
         if (shouldFetch && data && (gtin || termoProduto)) {
-            if (gtin) {
-                saveProducts();
-            }
             if (onDataFetched) onDataFetched(data);
-            setShouldFetch(false); 
+            setShouldFetch(false);
         }
-    }, [data, gtin, termoProduto, shouldFetch, onDataFetched, saveProductsMutation]);
+    }, [data, gtin, termoProduto, shouldFetch, onDataFetched]);
 
     const handleBuscar = () => {
         if (!selectedCidade || !selectedBase) {
