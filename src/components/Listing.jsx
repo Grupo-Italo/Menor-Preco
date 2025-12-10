@@ -18,12 +18,12 @@ export function Listing({ data }) {
     }));
 
     const columns = [
-        { field: 'loja', headerName: 'Loja', width: 400 },
-        { field: 'preco', headerName: 'Preço', width: 150 },
-        { field: 'endereco', headerName: 'Endereço', width: 400 },
-        { field: 'distancia', headerName: 'Distância (km)', width: 150 },
-        { field: 'tempo', headerName: 'Tempo', width: 150 },
-        { field: 'cidade', headerName: 'Cidade/UF', width: 260 }
+        { field: 'loja', headerName: 'Loja', flex: 1, minWidth: 250 },
+        { field: 'preco', headerName: 'Preço', width: 100 },
+        { field: 'endereco', headerName: 'Endereço', flex: 1, minWidth: 300 },
+        { field: 'distancia', headerName: 'Distância (km)', width: 120 },
+        { field: 'tempo', headerName: 'Tempo', width: 100 },
+        { field: 'cidade', headerName: 'Cidade/UF', flex: 0.8, minWidth: 150 }
     ];
 
     return (

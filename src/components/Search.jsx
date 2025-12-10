@@ -114,7 +114,18 @@ export function Search({ onDataFetched }) {
     }, [selectedCidade, selectedBase, gtin, termoProduto, codigoLocalidade]);
 
     return (
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end', flexWrap: 'wrap', padding: 2 }}>
+        <Box sx={{ 
+            display: 'flex', 
+            gap: 2, 
+            alignItems: 'flex-end', 
+            flexWrap: 'wrap', 
+            padding: 2,
+            '& > *': {
+                flex: '1 1 auto',
+                minWidth: '150px',
+                maxWidth: '350px'
+            }
+        }}>
             {isLoading && <Box sx={{ width: '100%', color: 'white' }}>Carregando...</Box>}
             {error && <Box sx={{ width: '100%', color: 'red' }}>Erro ao buscar dados. Tente novamente.</Box>}
 
@@ -151,7 +162,7 @@ export function Search({ onDataFetched }) {
                 value={gtin}
                 onChange={handleGtinChange}
                 disabled={!!termoProduto}
-                sx={{ ...inputStyles, minWidth: 200 }}
+                sx={inputStyles}
             />
 
             <TextField
@@ -176,7 +187,7 @@ export function Search({ onDataFetched }) {
                 label="Raio de busca"
                 value={raio}
                 onChange={handleRaioChange}
-                sx={{ ...inputStyles, minWidth: 100 }}
+                sx={inputStyles}
             >
                 <MenuItem value={5000}>5000 Metros</MenuItem>
                 <MenuItem value={2000}>2000 Metros</MenuItem>

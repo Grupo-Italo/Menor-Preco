@@ -1,5 +1,5 @@
 export const inputStyles = {
-    flex: 1,
+    minWidth: '150px',
     '& .MuiOutlinedInput-root': {
         backgroundColor: '#2c2c2c',
         color: 'white',
@@ -29,8 +29,7 @@ export const autocompleteStyles = {
 };
 
 export const readOnlyInputStyles = {
-    minWidth: 200,
-    flex: 1,
+    minWidth: '150px',
     '& .MuiOutlinedInput-root': {
         backgroundColor: '#2c2c2c',
         color: '#9e9e9e',
