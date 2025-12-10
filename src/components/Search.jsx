@@ -31,13 +31,13 @@ export function Search({ onDataFetched }) {
 
     const { data: cidades = [], isLoading: loadingCidades } = useApi(
         'cidades',
-        'http://localhost:3000/italoBases/cities',
+        process.env.REACT_APP_CITIES_URL || 'http://localhost:3000/italoBases/cities',
         { enabled: openAutocomplete }
     );
 
     const { data: bases = [], isLoading: loadingBases } = useApi(
         'bases',
-        'http://localhost:3000/italoBases/bases',
+        process.env.REACT_APP_BASES_URL || 'http://localhost:3000/italoBases/bases',
         {
             enabled: shouldFetchBases && !!selectedCidade,
             params: { name: selectedCidade?.cidade }
@@ -46,7 +46,7 @@ export function Search({ onDataFetched }) {
 
     const { data, isLoading, error } = useApi(
         'menor-preco',
-        'http://localhost:3000/nota-parana/search',
+        process.env.REACT_APP_NOTA_PARANA_URL || 'http://localhost:3000/nota-parana/search',
         {
             enabled: shouldFetch && !!codigoLocalidade && (!!gtin || !!termoProduto),
             params: {
