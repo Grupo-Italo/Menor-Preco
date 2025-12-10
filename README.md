@@ -21,15 +21,6 @@ Este projeto permite aos usuários pesquisar produtos por código GTIN (código 
   - Cidade/UF
 - 🎨 **Interface Moderna**: Design responsivo com Material-UI
 
-## 🚀 Tecnologias Utilizadas
-
-- **React 19** - Biblioteca JavaScript para interfaces
-- **Vite** - Build tool e dev server
-- **Material-UI (MUI)** - Componentes de interface
-- **TanStack Query** - Gerenciamento de estado e cache de dados
-- **MUI DataGrid** - Tabela de dados avançada
-- **Emotion** - Estilização CSS-in-JS
-
 ## 📦 Instalação
 
 ```bash
@@ -46,15 +37,6 @@ npm install
 npm run dev
 ```
 
-## 🛠️ Scripts Disponíveis
-
-```bash
-npm run dev      # Inicia o servidor de desenvolvimento
-npm run build    # Cria build de produção
-npm run preview  # Preview do build de produção
-npm run lint     # Executa o linter
-```
-
 ## 🌐 API Utilizada
 
 O projeto consome a API pública do Nota Paraná:
@@ -66,21 +48,6 @@ Parâmetros:
 - `local`: Código de localidade
 - `gtin`: Código GTIN do produto
 
-## 📂 Estrutura do Projeto
-
-```
-src/
-├── components/
-│   ├── Header.jsx      # Cabeçalho da aplicação
-│   ├── Search.jsx      # Formulário de busca
-│   ├── Metrics.jsx     # Cards de métricas
-│   └── Listing.jsx     # Tabela de resultados
-├── pages/
-│   └── SearchPrices.jsx # Página principal
-├── data/
-│   └── baselocais.js   # Base de localidades
-└── main.jsx            # Ponto de entrada da aplicação
-```
 
 ## 👥 Contribuidores
 
