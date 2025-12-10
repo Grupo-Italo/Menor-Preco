@@ -1,6 +1,7 @@
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import { Button, Box, Snackbar, Alert } from '@mui/material';
+import MenuItem from '@mui/material/MenuItem';
+import { Box, Snackbar, Alert } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useApi } from '../hooks/useApi';
 import { inputStyles, autocompleteStyles, readOnlyInputStyles } from '../styles/inputStyles';
@@ -11,6 +12,7 @@ export function Search({ onDataFetched }) {
     const [codigoLocalidade, setCodigoLocalidade] = useState('');
     const [gtin, setGtin] = useState('');
     const [termoProduto, setTermoProduto] = useState('');
+    const [raio, setRaio] = useState('');
     const [shouldFetch, setShouldFetch] = useState(false);
     const [openAutocomplete, setOpenAutocomplete] = useState(false);
     const [shouldFetchBases, setShouldFetchBases] = useState(false);
@@ -50,7 +52,8 @@ export function Search({ onDataFetched }) {
             params: {
                 local: codigoLocalidade,
                 ...(gtin && { gtin }),
-                ...(termoProduto && { termo: termoProduto })
+                ...(termoProduto && { termo: termoProduto }),
+                ...(raio && { raio })
             }
         }
     );
@@ -79,10 +82,11 @@ export function Search({ onDataFetched }) {
         if (value) setGtin('');
     };
 
+    const handleRaioChange = (event) => {
+        setRaio(event.target.value);
+    };
+
     useEffect(() => {
-        // Quando a busca for concluída (por GTIN ou termo), notificamos o parent
-        // O backend já está persistindo os dados, então o frontend não precisa mais
-        // enviar nada para gravação.
         if (shouldFetch && data && (gtin || termoProduto)) {
             if (onDataFetched) onDataFetched(data);
             setShouldFetch(false);
@@ -100,6 +104,14 @@ export function Search({ onDataFetched }) {
         }
         setShouldFetch(true);
     };
+
+    useEffect(() => {
+        const onExecute = () => {
+            handleBuscar();
+        };
+        window.addEventListener('executarBusca', onExecute);
+        return () => window.removeEventListener('executarBusca', onExecute);
+    }, [selectedCidade, selectedBase, gtin, termoProduto, codigoLocalidade]);
 
     return (
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end', flexWrap: 'wrap', padding: 2 }}>
@@ -159,13 +171,19 @@ export function Search({ onDataFetched }) {
                 sx={readOnlyInputStyles}
             />
 
-            <Button
-                variant="contained"
-                onClick={handleBuscar}
-                sx={{ height: 56, minWidth: 150, textTransform: 'none', fontSize: '1rem' }}
+            <TextField
+                select
+                label="Raio de busca"
+                value={raio}
+                onChange={handleRaioChange}
+                sx={{ ...inputStyles, minWidth: 180 }}
             >
-                Executar busca
-            </Button>
+                <MenuItem value={2000}>5000M</MenuItem>
+                <MenuItem value={2000}>2000M</MenuItem>
+                <MenuItem value={1000}>1000M</MenuItem>
+                <MenuItem value={500}>500M</MenuItem>
+                <MenuItem value={100}>100M</MenuItem>
+            </TextField>
 
             <Snackbar
                 open={snackbar.open}
