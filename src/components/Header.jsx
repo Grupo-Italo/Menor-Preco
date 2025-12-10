@@ -3,7 +3,6 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { Button } from '@mui/material';
 
 export function Header() {
 
@@ -33,19 +32,6 @@ export function Header() {
                         Pesquisa de preços - Dashborad
                     </Typography>
                     <Box sx={{ flexGrow: 1 }} />
-                    <Button
-                        variant="contained"
-                        onClick={() => window.dispatchEvent(new CustomEvent('executarBusca'))}
-                        sx={{
-                            backgroundColor: '#3a3a3a',
-                            color: 'white',
-                            textTransform: 'none',
-                            '&:hover': { backgroundColor: '#323232' },
-                            height: 40,
-                        }}
-                    >
-                        Executar busca
-                    </Button>
                 </Toolbar>
             </Container>
         </AppBar>

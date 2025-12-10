@@ -1,10 +1,10 @@
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import MenuItem from '@mui/material/MenuItem';
-import { Box, Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
+import { Box, Snackbar, Alert, Backdrop, CircularProgress, Button } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useApi } from '../hooks/useApi';
-import { inputStyles, autocompleteStyles, readOnlyInputStyles, largeInputStyles, smallInputStyles, loadingStyles } from '../styles/inputStyles';
+import { inputStyles, readOnlyInputStyles, largeInputStyles, smallInputStyles, loadingStyles, buttonSearchStyles } from '../styles/inputStyles';
 
 export function Search({ onDataFetched }) {
     const [selectedCidade, setSelectedCidade] = useState(null);
@@ -198,6 +198,14 @@ export function Search({ onDataFetched }) {
                 <MenuItem value={500}>500 Metros</MenuItem>
                 <MenuItem value={100}>100 Metros</MenuItem>
             </TextField>
+
+            <Button
+                variant="contained"
+                onClick={() => window.dispatchEvent(new CustomEvent('executarBusca'))}
+                sx={buttonSearchStyles}
+            >
+                Executar busca
+            </Button>
 
             <Snackbar
                 open={snackbar.open}

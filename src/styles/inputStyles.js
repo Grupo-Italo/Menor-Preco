@@ -44,9 +44,23 @@ export const readOnlyInputStyles = {
 
 export const largeInputStyles = {
     ...autocompleteStyles,
-    minWidth: '250px',
-    maxWidth: '500px',
-    flex: '1.5 1 auto'
+    minWidth: '200px',
+    maxWidth: '370px',
+    flex: '1.1 1 auto'
+};
+
+export const buttonSearchStyles = {
+    backgroundColor: '#1976d2',
+    color: 'white',
+    textTransform: 'none',
+    fontSize: '0.85rem',
+    padding: '6px 10px',
+    flex: '0.5 1 auto',
+    minWidth: '100px',
+    alignSelf: 'center',
+    '&:hover': {
+        backgroundColor: '#1565c0'
+    }
 };
 
 export const smallInputStyles = {
