@@ -1,5 +1,4 @@
 export const inputStyles = {
-    minWidth: 250,
     flex: 1,
     '& .MuiOutlinedInput-root': {
         backgroundColor: '#2c2c2c',

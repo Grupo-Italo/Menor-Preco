@@ -31,13 +31,13 @@ export function Search({ onDataFetched }) {
 
     const { data: cidades = [], isLoading: loadingCidades } = useApi(
         'cidades',
-        process.env.REACT_APP_CITIES_URL || 'http://localhost:3000/italoBases/cities',
+        import.meta.env.VITE_CITIES_URL || 'http://localhost:3000/italoBases/cities',
         { enabled: openAutocomplete }
     );
 
     const { data: bases = [], isLoading: loadingBases } = useApi(
         'bases',
-        process.env.REACT_APP_BASES_URL || 'http://localhost:3000/italoBases/bases',
+        import.meta.env.VITE_BASES_URL || 'http://localhost:3000/italoBases/bases',
         {
             enabled: shouldFetchBases && !!selectedCidade,
             params: { name: selectedCidade?.cidade }
@@ -46,7 +46,7 @@ export function Search({ onDataFetched }) {
 
     const { data, isLoading, error } = useApi(
         'menor-preco',
-        process.env.REACT_APP_NOTA_PARANA_URL || 'http://localhost:3000/nota-parana/search',
+        import.meta.env.VITE_NOTA_PARANA_URL || 'http://localhost:3000/nota-parana/search',
         {
             enabled: shouldFetch && !!codigoLocalidade && (!!gtin || !!termoProduto),
             params: {
@@ -176,7 +176,7 @@ export function Search({ onDataFetched }) {
                 label="Raio de busca"
                 value={raio}
                 onChange={handleRaioChange}
-                sx={{ ...inputStyles, minWidth: 180 }}
+                sx={{ ...inputStyles, minWidth: 100 }}
             >
                 <MenuItem value={5000}>5000 Metros</MenuItem>
                 <MenuItem value={2000}>2000 Metros</MenuItem>
