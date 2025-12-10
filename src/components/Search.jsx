@@ -1,10 +1,10 @@
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import MenuItem from '@mui/material/MenuItem';
-import { Box, Snackbar, Alert } from '@mui/material';
+import { Box, Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useApi } from '../hooks/useApi';
-import { inputStyles, autocompleteStyles, readOnlyInputStyles } from '../styles/inputStyles';
+import { inputStyles, autocompleteStyles, readOnlyInputStyles, largeInputStyles, smallInputStyles, loadingStyles } from '../styles/inputStyles';
 
 export function Search({ onDataFetched }) {
     const [selectedCidade, setSelectedCidade] = useState(null);
@@ -114,20 +114,23 @@ export function Search({ onDataFetched }) {
     }, [selectedCidade, selectedBase, gtin, termoProduto, codigoLocalidade]);
 
     return (
-        <Box sx={{ 
-            display: 'flex', 
-            gap: 2, 
-            alignItems: 'flex-end', 
-            flexWrap: 'wrap', 
-            padding: 2,
-            '& > *': {
-                flex: '1 1 auto',
-                minWidth: '150px',
-                maxWidth: '350px'
-            }
-        }}>
-            {isLoading && <Box sx={{ width: '100%', color: 'white' }}>Carregando...</Box>}
-            {error && <Box sx={{ width: '100%', color: 'red' }}>Erro ao buscar dados. Tente novamente.</Box>}
+        <>
+            <Backdrop open={isLoading} sx={loadingStyles}>
+                <CircularProgress color="inherit" />
+            </Backdrop>
+            <Box sx={{ 
+                display: 'flex', 
+                gap: 2, 
+                alignItems: 'flex-end', 
+                flexWrap: 'wrap', 
+                padding: 2,
+                '& > *': {
+                    flex: '1 1 auto',
+                    minWidth: '150px',
+                    maxWidth: '350px'
+                }
+            }}>
+                {error && <Box sx={{ width: '100%', color: 'red' }}>Erro ao buscar dados. Tente novamente.</Box>}
 
             <Autocomplete
                 disablePortal
@@ -137,7 +140,7 @@ export function Search({ onDataFetched }) {
                 isOptionEqualToValue={(option, value) => option.cidade === value.cidade}
                 onOpen={() => setOpenAutocomplete(true)}
                 onClose={() => setOpenAutocomplete(false)}
-                sx={autocompleteStyles}
+                sx={largeInputStyles}
                 value={selectedCidade}
                 onChange={handleCidadeChange}
                 renderInput={(params) => <TextField {...params} label="Cidade" />}
@@ -150,7 +153,7 @@ export function Search({ onDataFetched }) {
                 loading={loadingBases}
                 getOptionLabel={(option) => option.nome || ''}
                 isOptionEqualToValue={(option, value) => option.geohash === value.geohash}
-                sx={autocompleteStyles}
+                sx={largeInputStyles}
                 value={selectedBase}
                 onChange={handleBaseChange}
                 renderInput={(params) => <TextField {...params} label="Base" />}
@@ -162,7 +165,7 @@ export function Search({ onDataFetched }) {
                 value={gtin}
                 onChange={handleGtinChange}
                 disabled={!!termoProduto}
-                sx={inputStyles}
+                sx={smallInputStyles}
             />
 
             <TextField
@@ -179,7 +182,7 @@ export function Search({ onDataFetched }) {
                 variant="outlined"
                 value={codigoLocalidade}
                 InputProps={{ readOnly: true }}
-                sx={readOnlyInputStyles}
+                sx={{ ...smallInputStyles, ...readOnlyInputStyles }}
             />
 
             <TextField
@@ -207,5 +210,6 @@ export function Search({ onDataFetched }) {
                 </Alert>
             </Snackbar>
         </Box>
+        </>
     );
 }

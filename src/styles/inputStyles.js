@@ -41,3 +41,34 @@ export const readOnlyInputStyles = {
         color: '#9e9e9e',
     }
 };
+
+export const largeInputStyles = {
+    ...autocompleteStyles,
+    minWidth: '250px',
+    maxWidth: '500px',
+    flex: '1.5 1 auto'
+};
+
+export const smallInputStyles = {
+    ...inputStyles,
+    minWidth: '100px',
+    maxWidth: '150px',
+    flex: '0.6 1 auto'
+};
+
+export const loadingStyles = {
+    position: 'fixed',
+    inset: 0,
+    width: '100vw',
+    height: '100vh',
+    zIndex: 1400,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    color: '#fff',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    '& .MuiCircularProgress-root': {
+        color: '#8ab4f8'
+    }
+};

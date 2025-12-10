@@ -10,7 +10,7 @@ export function Listing({ data }) {
     const rows = data.produtos.map((item) => ({
         id: item.id,
         loja: item.estabelecimento.nm_emp,
-        preco: item.valor,
+        preco: `R$ ${item.valor}`,
         endereco: `${item.estabelecimento.nm_logr}, ${item.estabelecimento.nr_logr} - ${item.estabelecimento.bairro}`,
         distancia: `${item.distkm}km`,
         tempo: item.tempo ? `${item.tempo}` : '-',
@@ -27,7 +27,7 @@ export function Listing({ data }) {
     ];
 
     return (
-        <Box sx={{ height: 500, width: '100%', mt: 2 }}>
+        <Box sx={{ height: 'calc(100vh - 360px)', minHeight: 300, width: '100%', mt: 2, overflow: 'auto' }}>
             <DataGrid
                 rows={rows}
                 columns={columns}
