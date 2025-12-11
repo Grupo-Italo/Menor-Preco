@@ -11,7 +11,7 @@ function SearchPrices() {
     return (
         <>
             <Header />
-            <Box sx={{ mt: 8, px: 2 }}>
+            <Box sx={{ mt: 8, px: 1 }}>
                 <Search onDataFetched={setProductsData} />
                 <Metrics data={productsData} />
                 <Listing data={productsData} />

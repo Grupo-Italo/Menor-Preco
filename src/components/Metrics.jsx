@@ -1,7 +1,13 @@
 import { Box, Card, CardContent, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 
 export function Metrics({ data }) {
-    debugger
+    const [productInfo, setProductInfo] = useState('');
+
+    useEffect(() => {
+        data && data.productInfo ? setProductInfo(data.productInfo[0]) : setProductInfo('');
+    }, [data]);
+
     const calcularMetricas = () => {
         if (!data || !data.produtos || data.produtos.length === 0) {
             return {
@@ -17,7 +23,7 @@ export function Metrics({ data }) {
 
         const precos = data.produtos.map(p => parseFloat(p.valor));
         const menor = data.precos?.min
-        const maior = data.precos?.max 
+        const maior = data.precos?.max
         const media = (precos.reduce((a, b) => a + b, 0) / precos.length).toFixed(2);
 
         const frequencia = {};
@@ -66,16 +72,13 @@ export function Metrics({ data }) {
                             Produto
                         </Typography>
                         <Typography variant="h7" display={'block'}>
-                            {/* {data.produtosInfo.prod_descricao} */}
-                            Produto Exemplo
+                            Código interno: {productInfo ? productInfo.prod_codigo : '-'}
                         </Typography>
                         <Typography variant="subtitle2" display={'block'} sx={{ color: '#9e9e9eff' }}>
-                            {/* {data.produtosInfo.prod_marca} */}
-                            Marca Exemplo
+                            {productInfo ? productInfo.prod_descricao : 'Produto não encontrado'}
                         </Typography>
                         <Typography variant="subtitle2" sx={{ color: '#9e9e9eff' }}>
-                            {/* {data.produtosInfo.prod_codigo} */}
-                            Gtin: 1234567890123
+                            Marca: {productInfo ? productInfo.prod_marca : '-'}
                         </Typography>
                     </CardContent>
                 </Card>

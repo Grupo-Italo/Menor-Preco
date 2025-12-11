@@ -50,11 +50,11 @@ export const largeInputStyles = {
 };
 
 export const buttonSearchStyles = {
-    backgroundColor: '#1976d2',
+    backgroundColor: '#3c5271ff',
     color: 'white',
     textTransform: 'none',
-    fontSize: '0.85rem',
     padding: '6px 10px',
+    fontWeight: 600,
     flex: '0.5 1 auto',
     minWidth: '100px',
     alignSelf: 'center',
