@@ -1,6 +1,7 @@
 import { Box, Card, CardContent, Typography } from '@mui/material';
 
 export function Metrics({ data }) {
+    debugger
     const calcularMetricas = () => {
         if (!data || !data.produtos || data.produtos.length === 0) {
             return {
@@ -62,6 +63,26 @@ export function Metrics({ data }) {
                 <Card sx={{ backgroundColor: '#2c2c2c', color: 'white', flex: 1 }}>
                     <CardContent sx={{ py: 1.5 }}>
                         <Typography variant="subtitle2" sx={{ color: '#8ab4f8', mb: 0.5 }}>
+                            Produto
+                        </Typography>
+                        <Typography variant="h7" display={'block'}>
+                            {/* {data.produtosInfo.prod_descricao} */}
+                            Produto Exemplo
+                        </Typography>
+                        <Typography variant="subtitle2" display={'block'} sx={{ color: '#9e9e9eff' }}>
+                            {/* {data.produtosInfo.prod_marca} */}
+                            Marca Exemplo
+                        </Typography>
+                        <Typography variant="subtitle2" sx={{ color: '#9e9e9eff' }}>
+                            {/* {data.produtosInfo.prod_codigo} */}
+                            Gtin: 1234567890123
+                        </Typography>
+                    </CardContent>
+                </Card>
+
+                <Card sx={{ backgroundColor: '#2c2c2c', color: 'white', flex: 1 }}>
+                    <CardContent sx={{ py: 1.5 }}>
+                        <Typography variant="subtitle2" sx={{ color: '#8ab4f8', mb: 0.5 }}>
                             Última Consulta
                         </Typography>
                         <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>
@@ -70,7 +91,7 @@ export function Metrics({ data }) {
                         <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>
                             Executada em: {ultimaConsulta.executadaEm}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: '#9e9e9e' }}>
+                        <Typography variant="caption" sx={{ color: '#9e9e9eff' }}>
                             Tempo de resposta: {ultimaConsulta.tempo}
                         </Typography>
                     </CardContent>
