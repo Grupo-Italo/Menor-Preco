@@ -1,21 +1,20 @@
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import MenuItem from '@mui/material/MenuItem';
 import { Box, Snackbar, Alert, Backdrop, CircularProgress, Button } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useApi } from '../hooks/useApi';
-import { inputStyles, readOnlyInputStyles, largeInputStyles, smallInputStyles, loadingStyles, buttonSearchStyles, boxSearchStyles } from '../styles/inputStyles';
+import { largeInputStyles, loadingStyles, buttonSearchStyles, boxSearchStyles } from '../styles/inputStyles';
 
-export function Search({ onDataFetched }) {
+export function SearchGroups({ onDataFetched }) {
     const [selectedCidade, setSelectedCidade] = useState(null);
     const [selectedBase, setSelectedBase] = useState(null);
     const [codigoLocalidade, setCodigoLocalidade] = useState('');
-    const [gtin, setGtin] = useState('');
-    const [termoProduto, setTermoProduto] = useState('');
-    const [raio, setRaio] = useState(3000);
-    const [shouldFetch, setShouldFetch] = useState(false);
+    const [selectedGrupo, setSelectedGrupo] = useState(null);
+    const [selectedMarca, setSelectedMarca] = useState(null);
+
     const [openAutocomplete, setOpenAutocomplete] = useState(false);
     const [shouldFetchBases, setShouldFetchBases] = useState(false);
+    const [shouldFetch, setShouldFetch] = useState(false);
 
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
 
@@ -23,11 +22,9 @@ export function Search({ onDataFetched }) {
         setSnackbar({ open: true, message, severity });
     };
 
-    const handleCloseSnackbar = (event, reason) => {
-        if (reason === 'clickaway') return;
+    const handleCloseSnackbar = () => {
         setSnackbar({ ...snackbar, open: false });
     };
-
 
     const { data: cidades = [], isLoading: loadingCidades } = useApi(
         'cidades',
@@ -44,82 +41,69 @@ export function Search({ onDataFetched }) {
         }
     );
 
-    const { data, isLoading, error } = useApi(
-        'menor-preco',
-        import.meta.env.VITE_NOTA_PARANA_URL || 'http://localhost:3000/nota-parana/search',
-        {
-            enabled: shouldFetch && !!codigoLocalidade && (!!gtin || !!termoProduto),
-            params: {
-                local: codigoLocalidade,
-                ...(gtin && { gtin }),
-                ...(termoProduto && { termo: termoProduto }),
-                ...(raio && { raio })
-            }
-        }
+    const { data: grupos = [], isLoading: loadingGrupos } = useApi(
+        'grupos',
+        import.meta.env.VITE_GRUPOS_URL || 'http://localhost:3000/italoGroups/groups',
+        { enabled: openAutocomplete }
     );
 
-    const handleCidadeChange = (event, newValue) => {
+    const { data: brands = [], isLoading: loadingBrands } = useApi(
+        'marcas',
+        import.meta.env.VITE_MARCAS_URL || 'http://localhost:3000/italoGroups/brands',
+        { enabled: openAutocomplete }
+    );
+
+    // const { data, isLoading, error } = useApi(
+    //     'menor-preco',
+    //     import.meta.env.VITE_NOTA_PARANA_URL || 'http://localhost:3000/menorPreco',
+    //     {
+    //         enabled: shouldFetch && !!codigoLocalidade,
+    //         params: { local: codigoLocalidade }
+    //     }
+    // );
+
+    const handleCidadeChange = (_, newValue) => {
         setSelectedCidade(newValue);
         setSelectedBase(null);
         setCodigoLocalidade('');
         setShouldFetchBases(!!newValue);
     };
 
-    const handleBaseChange = (event, newValue) => {
+    const handleBaseChange = (_, newValue) => {
         setSelectedBase(newValue);
         setCodigoLocalidade(newValue ? newValue.geohash : '');
     };
-
-    const handleGtinChange = (event) => {
-        const value = event.target.value;
-        setGtin(value);
-        if (value) setTermoProduto('');
-    };
-
-    const handleTermoChange = (event) => {
-        const value = event.target.value;
-        setTermoProduto(value);
-        if (value) setGtin('');
-    };
-
-    const handleRaioChange = (event) => {
-        setRaio(event.target.value);
-    };
-
-    useEffect(() => {
-        if (shouldFetch && data && (gtin || termoProduto)) {
-            if (onDataFetched) onDataFetched(data);
-            setShouldFetch(false);
-        }
-    }, [data, gtin, termoProduto, shouldFetch, onDataFetched]);
 
     const handleBuscar = () => {
         if (!selectedCidade || !selectedBase) {
             showSnackbar('Por favor, preencha a cidade e a base', 'warning');
             return;
         }
-        if (!gtin && !termoProduto) {
-            showSnackbar('Por favor, preencha o GTIN ou o nome do produto', 'warning');
-            return;
-        }
         setShouldFetch(true);
     };
 
     useEffect(() => {
-        const onExecute = () => {
-            handleBuscar();
-        };
+        const onExecute = () => handleBuscar();
         window.addEventListener('executarBusca', onExecute);
         return () => window.removeEventListener('executarBusca', onExecute);
-    }, [selectedCidade, selectedBase, gtin, termoProduto, codigoLocalidade]);
+    }, [selectedCidade, selectedBase, codigoLocalidade]);
+
+    // useEffect(() => {
+    //     if (shouldFetch && data) {
+    //         if (onDataFetched) onDataFetched(data);
+    //         setShouldFetch(false);
+    //     }
+    // }, [data, shouldFetch, onDataFetched]);
 
     return (
         <>
-            <Backdrop open={isLoading} sx={loadingStyles}>
+            {/* <Backdrop open={isLoading || loadingBases || loadingCidades} sx={loadingStyles}>
                 <CircularProgress color="inherit" />
-            </Backdrop>
+            </Backdrop> */}
+
             <Box sx={boxSearchStyles}>
-                {error && <Box sx={{ width: '100%', color: 'red' }}>Erro ao buscar dados. Tente novamente.</Box>}
+
+                {/* {error && <Box sx={{ width: '100%', color: 'red' }}>Erro ao buscar dados.</Box>} */}
 
                 <Autocomplete
                     disablePortal
@@ -148,46 +132,31 @@ export function Search({ onDataFetched }) {
                     renderInput={(params) => <TextField {...params} label="Base" />}
                 />
 
-                <TextField
-                    label="Gtin"
-                    variant="outlined"
-                    value={gtin}
-                    onChange={handleGtinChange}
-                    disabled={!!termoProduto}
-                    sx={smallInputStyles}
+                <Autocomplete
+                    disablePortal
+                    options={grupos}
+                    loading={loadingGrupos}
+                    onClose={() => setOpenAutocomplete(false)}
+                    onOpen={() => setOpenAutocomplete(true)}
+                    getOptionLabel={(option) => option.grup_descricao || ''}
+                    sx={largeInputStyles}
+                    value={selectedGrupo}
+                    onChange={(_, newValue) => setSelectedGrupo(newValue)}
+                    renderInput={(params) => <TextField {...params} label="Grupo do produto" />}
                 />
 
-                <TextField
-                    label="Nome do Produto"
-                    variant="outlined"
-                    value={termoProduto}
-                    onChange={handleTermoChange}
-                    disabled={!!gtin}
-                    sx={inputStyles}
+                <Autocomplete
+                    disablePortal
+                    options={brands}
+                    loading={loadingBrands}
+                    getOptionLabel={(option) => option.marca || ''}
+                    onClose={() => setOpenAutocomplete(false)}
+                    onOpen={() => setOpenAutocomplete(true)}
+                    sx={largeInputStyles}
+                    value={selectedMarca}
+                    onChange={(_, newValue) => setSelectedMarca(newValue)}
+                    renderInput={(params) => <TextField {...params} label="Marca" />}
                 />
-
-                <TextField
-                    label="Código de localidade"
-                    variant="outlined"
-                    value={codigoLocalidade}
-                    InputProps={{ readOnly: true }}
-                    sx={{ ...smallInputStyles, ...readOnlyInputStyles }}
-                />
-
-                <TextField
-                    select
-                    label="Raio de busca"
-                    value={raio}
-                    onChange={handleRaioChange}
-                    sx={inputStyles}
-                >
-                    <MenuItem value={10000}>10000 Metros</MenuItem>
-                    <MenuItem value={5000}>5000 Metros</MenuItem>
-                    <MenuItem value={2000}>2000 Metros</MenuItem>
-                    <MenuItem value={1000}>1000 Metros</MenuItem>
-                    <MenuItem value={500}>500 Metros</MenuItem>
-                    <MenuItem value={100}>100 Metros</MenuItem>
-                </TextField>
 
                 <Button
                     variant="contained"

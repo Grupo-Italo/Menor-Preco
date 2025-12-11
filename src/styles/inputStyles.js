@@ -86,3 +86,16 @@ export const loadingStyles = {
         color: '#8ab4f8'
     }
 };
+
+export const boxSearchStyles = {
+    display: 'flex',
+    gap: 2,
+    alignItems: 'flex-end',
+    flexWrap: 'wrap',
+    padding: 2,
+    '& > *': {
+        flex: '1 1 auto',
+        minWidth: '150px',
+        maxWidth: '350px'
+    }
+}
