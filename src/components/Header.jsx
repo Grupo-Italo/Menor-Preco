@@ -29,7 +29,7 @@ export function Header() {
                             color: 'rgb(60, 82, 113)',
                         }}
                     >
-                        Pesquisa de preços - Dashborad
+                        Pesquisa de preços - GERAL
                     </Typography>
                     <Box sx={{ flexGrow: 1 }} />
                 </Toolbar>

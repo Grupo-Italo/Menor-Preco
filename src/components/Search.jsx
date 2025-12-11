@@ -192,6 +192,7 @@ export function Search({ onDataFetched }) {
                 onChange={handleRaioChange}
                 sx={inputStyles}
             >
+                <MenuItem value={10000}>10000 Metros</MenuItem>
                 <MenuItem value={5000}>5000 Metros</MenuItem>
                 <MenuItem value={2000}>2000 Metros</MenuItem>
                 <MenuItem value={1000}>1000 Metros</MenuItem>
