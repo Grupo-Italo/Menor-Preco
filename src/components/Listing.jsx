@@ -9,7 +9,7 @@ export function Listing({ data }) {
 
     const rows = data.produtos.map((item) => ({
         id: item.id,
-        loja: item.estabelecimento.nm_emp,
+        loja: item.estabelecimento.nm_fan || item.estabelecimento.nm_emp,
         preco: `R$ ${item.valor}`,
         endereco: `${item.estabelecimento.nm_logr}, ${item.estabelecimento.nr_logr} - ${item.estabelecimento.bairro}`,
         distancia: `${item.distkm}km`,

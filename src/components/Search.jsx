@@ -12,7 +12,7 @@ export function Search({ onDataFetched }) {
     const [codigoLocalidade, setCodigoLocalidade] = useState('');
     const [gtin, setGtin] = useState('');
     const [termoProduto, setTermoProduto] = useState('');
-    const [raio, setRaio] = useState('');
+    const [raio, setRaio] = useState(3000);
     const [shouldFetch, setShouldFetch] = useState(false);
     const [openAutocomplete, setOpenAutocomplete] = useState(false);
     const [shouldFetchBases, setShouldFetchBases] = useState(false);
