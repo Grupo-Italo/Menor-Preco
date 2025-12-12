@@ -1,7 +1,7 @@
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { Box, Snackbar, Alert, Backdrop, CircularProgress, Button } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useApi, useManualApi } from '../hooks/useApi';
 import { largeInputStyles, loadingStyles, buttonSearchStyles, boxSearchStyles } from '../styles/inputStyles';
 
@@ -10,8 +10,9 @@ export function SearchGroups({ onDataFetched }) {
     const [selectedBase, setSelectedBase] = useState(null);
     const [selectedGrupo, setSelectedGrupo] = useState(null);
     const [selectedMarca, setSelectedMarca] = useState(null);
+    const [produtoData, setProdutoData] = useState([])
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
-
+    console.log('produtoData', produtoData);
     const showSnackbar = (message, severity = 'info') => {
         setSnackbar({ open: true, message, severity });
     };
@@ -47,11 +48,25 @@ export function SearchGroups({ onDataFetched }) {
         { enabled: true }
     );
 
-    const { fetchData, isLoading: loadingData, error } = useManualApi(
-        'data',
+    const { data: produtosData = [], isLoading: loadingData, error, refetch } = useManualApi(
+        'produtosComConcorrentes',
         import.meta.env.VITE_DATA_URL || 'http://localhost:3000/italoGroups/groupsSearch',
-        { params: { grupoCodigo: selectedGrupo?.grup_codigo, italoBasesId: selectedBase?.id } }
+        {
+            enabled: false,
+            params: {
+                grupoCodigo: selectedGrupo?.grup_codigo,
+                italoBasesId: selectedBase?.id,
+                cidade: selectedCidade?.cidade,
+                geohash: selectedBase?.geohash
+            }
+        }
     );
+
+    useEffect(() => {
+        if (produtosData && produtosData.length > 0) {
+            setProdutoData(produtosData);
+        }
+    }, [produtosData]);
 
     const handleBuscar = async () => {
         if (!selectedCidade || !selectedBase || !selectedGrupo) {
@@ -59,19 +74,13 @@ export function SearchGroups({ onDataFetched }) {
             return;
         }
 
-        try {
-            const result = await fetchData({
-                grupoCodigo: selectedGrupo.grup_codigo,
-                italoBasesId: selectedBase.id,
-                cidade: selectedCidade.cidade,
-                geohash: selectedBase.geohash
-            });
-            if (onDataFetched) onDataFetched(result);
-        } catch (err) {
-            showSnackbar(err.message, 'error');
+        const result = await refetch(); // ✅ Agora funciona!
+
+        if (onDataFetched && result.data) {
+            onDataFetched(result.data);
         }
     };
-
+    
     return (
         <>
             <Backdrop open={loadingData || loadingBases || loadingCidades} sx={loadingStyles}>
@@ -114,6 +123,7 @@ export function SearchGroups({ onDataFetched }) {
                     options={grupos}
                     loading={loadingGrupos}
                     getOptionLabel={(option) => option.grup_descricao || ''}
+                    isOptionEqualToValue={(option, value) => option.grup_codigo === value.grup_codigo}
                     sx={largeInputStyles}
                     value={selectedGrupo}
                     onChange={(_, newValue) => setSelectedGrupo(newValue)}
