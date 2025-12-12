@@ -1,7 +1,7 @@
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { Box, Snackbar, Alert, Backdrop, CircularProgress, Button } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useApi, useManualApi } from '../hooks/useApi';
 import { largeInputStyles, loadingStyles, buttonSearchStyles, boxSearchStyles } from '../styles/inputStyles';
 
@@ -11,7 +11,6 @@ export function SearchGroups({ onDataFetched }) {
     const [selectedGrupo, setSelectedGrupo] = useState(null);
     const [selectedMarca, setSelectedMarca] = useState(null);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
-    console.log('Selected Marca:', selectedMarca);
 
     const showSnackbar = (message, severity = 'info') => {
         setSnackbar({ open: true, message, severity });

@@ -11,7 +11,7 @@ export function SearchGroupsListing({ data = [] }) {
 
         data.forEach(produto => {
             produto.concorrentes?.forEach(conc => {
-                if (conc.nome_empresa) competitorsSet.add(conc.nome_empresa);
+                if (conc.estabelecimento_nome) competitorsSet.add(conc.estabelecimento_nome);
             });
         });
 
@@ -21,8 +21,8 @@ export function SearchGroupsListing({ data = [] }) {
             const competitorValues = {};
 
             produto.concorrentes?.forEach(conc => {
-                if (conc.nome_empresa) {
-                    competitorValues[conc.nome_empresa] = parseFloat(conc.valor) || 0;
+                if (conc.estabelecimento_nome) {
+                    competitorValues[conc.estabelecimento_nome] = parseFloat(conc.valor) || 0;
                 }
             });
 
