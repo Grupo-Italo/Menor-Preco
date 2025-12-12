@@ -122,7 +122,7 @@ export function SearchGroups({ onDataFetched }) {
                     disablePortal
                     options={grupos}
                     loading={loadingGrupos}
-                    getOptionLabel={(option) => option.grup_descricao || ''}
+                    getOptionLabel={(option) => `${option.grup_descricao} - ${option.grup_codigo}` || ''}
                     isOptionEqualToValue={(option, value) => option.grup_codigo === value.grup_codigo}
                     sx={largeInputStyles}
                     value={selectedGrupo}
