@@ -1,21 +1,15 @@
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { Box, Snackbar, Alert, Backdrop, CircularProgress, Button } from '@mui/material';
-import { useState, useEffect } from 'react';
-import { useApi } from '../hooks/useApi';
+import { useState } from 'react';
+import { useApi, useManualApi } from '../hooks/useApi';
 import { largeInputStyles, loadingStyles, buttonSearchStyles, boxSearchStyles } from '../styles/inputStyles';
 
 export function SearchGroups({ onDataFetched }) {
     const [selectedCidade, setSelectedCidade] = useState(null);
     const [selectedBase, setSelectedBase] = useState(null);
-    const [codigoLocalidade, setCodigoLocalidade] = useState('');
     const [selectedGrupo, setSelectedGrupo] = useState(null);
     const [selectedMarca, setSelectedMarca] = useState(null);
-
-    const [openAutocomplete, setOpenAutocomplete] = useState(false);
-    const [shouldFetchBases, setShouldFetchBases] = useState(false);
-    const [shouldFetch, setShouldFetch] = useState(false);
-
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
 
     const showSnackbar = (message, severity = 'info') => {
@@ -29,14 +23,14 @@ export function SearchGroups({ onDataFetched }) {
     const { data: cidades = [], isLoading: loadingCidades } = useApi(
         'cidades',
         import.meta.env.VITE_CITIES_URL || 'http://localhost:3000/italoBases/cities',
-        { enabled: openAutocomplete }
+        { enabled: true }
     );
 
     const { data: bases = [], isLoading: loadingBases } = useApi(
         'bases',
         import.meta.env.VITE_BASES_URL || 'http://localhost:3000/italoBases/bases',
         {
-            enabled: shouldFetchBases && !!selectedCidade,
+            enabled: !!selectedCidade,
             params: { name: selectedCidade?.cidade }
         }
     );
@@ -44,66 +38,48 @@ export function SearchGroups({ onDataFetched }) {
     const { data: grupos = [], isLoading: loadingGrupos } = useApi(
         'grupos',
         import.meta.env.VITE_GRUPOS_URL || 'http://localhost:3000/italoGroups/groups',
-        { enabled: openAutocomplete }
+        { enabled: true }
     );
 
     const { data: brands = [], isLoading: loadingBrands } = useApi(
         'marcas',
         import.meta.env.VITE_MARCAS_URL || 'http://localhost:3000/italoGroups/brands',
-        { enabled: openAutocomplete }
+        { enabled: true }
     );
 
-    // const { data, isLoading, error } = useApi(
-    //     'menor-preco',
-    //     import.meta.env.VITE_NOTA_PARANA_URL || 'http://localhost:3000/menorPreco',
-    //     {
-    //         enabled: shouldFetch && !!codigoLocalidade,
-    //         params: { local: codigoLocalidade }
-    //     }
-    // );
+    const { fetchData, isLoading: loadingData, error } = useManualApi(
+        'data',
+        import.meta.env.VITE_DATA_URL || 'http://localhost:3000/italoGroups/groupsSearch',
+        { params: { grupoCodigo: selectedGrupo?.grup_codigo, italoBasesId: selectedBase?.id } }
+    );
 
-    const handleCidadeChange = (_, newValue) => {
-        setSelectedCidade(newValue);
-        setSelectedBase(null);
-        setCodigoLocalidade('');
-        setShouldFetchBases(!!newValue);
-    };
-
-    const handleBaseChange = (_, newValue) => {
-        setSelectedBase(newValue);
-        setCodigoLocalidade(newValue ? newValue.geohash : '');
-    };
-
-    const handleBuscar = () => {
-        if (!selectedCidade || !selectedBase) {
-            showSnackbar('Por favor, preencha a cidade e a base', 'warning');
+    const handleBuscar = async () => {
+        if (!selectedCidade || !selectedBase || !selectedGrupo) {
+            showSnackbar('Preencha todos os campos', 'warning');
             return;
         }
-        setShouldFetch(true);
+
+        try {
+            const result = await fetchData({
+                grupoCodigo: selectedGrupo.grup_codigo,
+                italoBasesId: selectedBase.id,
+                cidade: selectedCidade.cidade,
+                geohash: selectedBase.geohash
+            });
+            if (onDataFetched) onDataFetched(result);
+        } catch (err) {
+            showSnackbar(err.message, 'error');
+        }
     };
-
-    useEffect(() => {
-        const onExecute = () => handleBuscar();
-        window.addEventListener('executarBusca', onExecute);
-        return () => window.removeEventListener('executarBusca', onExecute);
-    }, [selectedCidade, selectedBase, codigoLocalidade]);
-
-    // useEffect(() => {
-    //     if (shouldFetch && data) {
-    //         if (onDataFetched) onDataFetched(data);
-    //         setShouldFetch(false);
-    //     }
-    // }, [data, shouldFetch, onDataFetched]);
 
     return (
         <>
-            {/* <Backdrop open={isLoading || loadingBases || loadingCidades} sx={loadingStyles}>
+            <Backdrop open={loadingData || loadingBases || loadingCidades} sx={loadingStyles}>
                 <CircularProgress color="inherit" />
-            </Backdrop> */}
+            </Backdrop>
 
             <Box sx={boxSearchStyles}>
-
-                {/* {error && <Box sx={{ width: '100%', color: 'red' }}>Erro ao buscar dados.</Box>} */}
+                {error && <Box sx={{ width: '100%', color: 'red' }}>Erro ao buscar dados.</Box>}
 
                 <Autocomplete
                     disablePortal
@@ -111,11 +87,12 @@ export function SearchGroups({ onDataFetched }) {
                     loading={loadingCidades}
                     getOptionLabel={(option) => option.cidade || ''}
                     isOptionEqualToValue={(option, value) => option.cidade === value.cidade}
-                    onOpen={() => setOpenAutocomplete(true)}
-                    onClose={() => setOpenAutocomplete(false)}
                     sx={largeInputStyles}
                     value={selectedCidade}
-                    onChange={handleCidadeChange}
+                    onChange={(_, newValue) => {
+                        setSelectedCidade(newValue);
+                        setSelectedBase(null);
+                    }}
                     renderInput={(params) => <TextField {...params} label="Cidade" />}
                 />
 
@@ -128,7 +105,7 @@ export function SearchGroups({ onDataFetched }) {
                     isOptionEqualToValue={(option, value) => option.geohash === value.geohash}
                     sx={largeInputStyles}
                     value={selectedBase}
-                    onChange={handleBaseChange}
+                    onChange={(_, newValue) => setSelectedBase(newValue)}
                     renderInput={(params) => <TextField {...params} label="Base" />}
                 />
 
@@ -136,8 +113,6 @@ export function SearchGroups({ onDataFetched }) {
                     disablePortal
                     options={grupos}
                     loading={loadingGrupos}
-                    onClose={() => setOpenAutocomplete(false)}
-                    onOpen={() => setOpenAutocomplete(true)}
                     getOptionLabel={(option) => option.grup_descricao || ''}
                     sx={largeInputStyles}
                     value={selectedGrupo}
@@ -150,19 +125,13 @@ export function SearchGroups({ onDataFetched }) {
                     options={brands}
                     loading={loadingBrands}
                     getOptionLabel={(option) => option.marca || ''}
-                    onClose={() => setOpenAutocomplete(false)}
-                    onOpen={() => setOpenAutocomplete(true)}
                     sx={largeInputStyles}
                     value={selectedMarca}
                     onChange={(_, newValue) => setSelectedMarca(newValue)}
                     renderInput={(params) => <TextField {...params} label="Marca" />}
                 />
 
-                <Button
-                    variant="contained"
-                    onClick={() => window.dispatchEvent(new CustomEvent('executarBusca'))}
-                    sx={buttonSearchStyles}
-                >
+                <Button variant="contained" onClick={handleBuscar} sx={buttonSearchStyles}>
                     Executar busca
                 </Button>
 

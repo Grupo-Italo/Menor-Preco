@@ -20,3 +20,14 @@ export const useApi = (queryKey, url, options = {}) => {
         enabled,
     });
 };
+
+export const useManualApi = (queryKey, url) => {
+    const fetchData = async (params = {}) => {
+        const queryParams = new URLSearchParams(params).toString();
+        const response = await fetch(queryParams ? `${url}?${queryParams}` : url);
+        if (!response.ok) throw new Error('Erro ao buscar dados');
+        return response.json();
+    };
+
+    return { fetchData };
+};
