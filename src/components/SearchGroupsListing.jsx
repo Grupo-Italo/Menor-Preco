@@ -2,38 +2,29 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import { useMemo } from 'react';
 
 export function SearchGroupsListing({ data = [] }) {
-    // Processa os dados e encontra todos os concorrentes únicos
     const { processedData, uniqueCompetitors } = useMemo(() => {
         if (!data || data.length === 0) {
             return { processedData: [], uniqueCompetitors: [] };
         }
 
-        // Mapeia todos os concorrentes únicos
         const competitorsSet = new Set();
 
         data.forEach(produto => {
-            if (produto.concorrentes && Array.isArray(produto.concorrentes)) {
-                produto.concorrentes.forEach(conc => {
-                    if (conc.nome_empresa) {
-                        competitorsSet.add(conc.nome_empresa);
-                    }
-                });
-            }
+            produto.concorrentes?.forEach(conc => {
+                if (conc.nome_empresa) competitorsSet.add(conc.nome_empresa);
+            });
         });
 
         const competitors = Array.from(competitorsSet);
 
-        // Processa os dados para criar um mapa de valores por concorrente
         const processed = data.map(produto => {
             const competitorValues = {};
 
-            if (produto.concorrentes && Array.isArray(produto.concorrentes)) {
-                produto.concorrentes.forEach(conc => {
-                    if (conc.nome_empresa) {
-                        competitorValues[conc.nome_empresa] = parseFloat(conc.valor) || 0;
-                    }
-                });
-            }
+            produto.concorrentes?.forEach(conc => {
+                if (conc.nome_empresa) {
+                    competitorValues[conc.nome_empresa] = parseFloat(conc.valor) || 0;
+                }
+            });
 
             return {
                 descricao: produto.prod_descricao || 'N/A',
@@ -45,13 +36,9 @@ export function SearchGroupsListing({ data = [] }) {
             };
         });
 
-        return {
-            processedData: processed,
-            uniqueCompetitors: competitors
-        };
+        return { processedData: processed, uniqueCompetitors: competitors };
     }, [data]);
 
-    // Formata valor em Real
     const formatCurrency = (value) => {
         if (!value || value === 0) return 'R$ 0,00';
         return new Intl.NumberFormat('pt-BR', {
@@ -60,7 +47,6 @@ export function SearchGroupsListing({ data = [] }) {
         }).format(value);
     };
 
-    // Retorna cor baseada na comparação de preços
     const getPriceColor = (valorLoja, valorConcorrente) => {
         if (!valorLoja || !valorConcorrente) return 'inherit';
         if (valorLoja < valorConcorrente) return '#4caf50';
@@ -84,23 +70,30 @@ export function SearchGroupsListing({ data = [] }) {
     return (
         <Box sx={{ width: '100%', mt: 3 }}>
             <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Typography variant="h6">
-                    Comparação de Preços
-                </Typography>
-                <Chip
-                    label={`${processedData.length} produto(s)`}
-                    size="small"
-                    color="primary"
-                />
-                <Chip
-                    label={`${uniqueCompetitors.length} concorrente(s)`}
-                    size="small"
-                    color="secondary"
-                />
+                <Typography variant="h6">Comparação de Preços</Typography>
+                <Chip label={`${processedData.length} produto(s)`} size="small" color="primary" />
+                <Chip label={`${uniqueCompetitors.length} concorrente(s)`} size="small" color="secondary" />
             </Box>
 
-            <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
-                <Table stickyHeader>
+            <TableContainer
+                component={Paper}
+                sx={{
+                    maxHeight: 600,
+                    overflowX: 'auto',
+                    overflowY: 'auto',
+                    backgroundColor: '#2c2c2c',
+                    color: 'white'
+                }}
+            >
+                <Table
+                    stickyHeader
+                    sx={{
+                        tableLayout: 'auto',
+                        width: 'max-content',
+                        minWidth: '100%',
+                        backgroundColor: '#2c2c2c'
+                    }}
+                >
                     <TableHead>
                         <TableRow>
                             <TableCell
@@ -108,41 +101,47 @@ export function SearchGroupsListing({ data = [] }) {
                                     fontWeight: 'bold',
                                     backgroundColor: '#3a3a3a',
                                     color: 'white',
-                                    minWidth: 250
+                                    minWidth: 250,
+                                    whiteSpace: 'nowrap'
                                 }}
                             >
                                 Produto
                             </TableCell>
+
                             <TableCell
                                 sx={{
                                     fontWeight: 'bold',
                                     backgroundColor: '#3a3a3a',
                                     color: 'white',
-                                    minWidth: 150
+                                    minWidth: 150,
+                                    whiteSpace: 'nowrap'
                                 }}
                             >
                                 GTIN
                             </TableCell>
+
                             <TableCell
                                 align="right"
                                 sx={{
                                     fontWeight: 'bold',
                                     backgroundColor: '#3a3a3a',
                                     color: 'white',
-                                    minWidth: 120
+                                    minWidth: 120,
+                                    whiteSpace: 'nowrap'
                                 }}
                             >
                                 ÍTALO
                             </TableCell>
+
                             {uniqueCompetitors.map((competitor, index) => (
                                 <TableCell
                                     key={index}
                                     align="right"
                                     sx={{
+                                        whiteSpace: 'nowrap',
                                         fontWeight: 'bold',
                                         backgroundColor: '#3a3a3a',
-                                        color: 'white',
-                                        minWidth: 150
+                                        color: 'white'
                                     }}
                                 >
                                     {competitor}
@@ -150,54 +149,71 @@ export function SearchGroupsListing({ data = [] }) {
                             ))}
                         </TableRow>
                     </TableHead>
+
                     <TableBody>
                         {processedData.map((produto, rowIndex) => (
                             <TableRow
+                                key={rowIndex}
                                 sx={{
                                     backgroundColor: '#3a3a3a',
-                                    '&:hover': { backgroundColor: '#3a3a3a' }
+                                    '&:hover': {
+                                        backgroundColor: '#444'
+                                    }
                                 }}
                             >
-
-                                <TableCell>
-                                    <Typography variant="body2" sx={{
-                                        fontWeight: 500, color: 'white',
-                                    }}>
+                                <TableCell
+                                    sx={{
+                                        whiteSpace: 'nowrap',
+                                        backgroundColor: '#3a3a3a',
+                                        color: 'white'
+                                    }}
+                                >
+                                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
                                         {produto.descricao}
                                     </Typography>
                                 </TableCell>
-                                <TableCell>
-                                    <Typography variant="body2" sx={{
-                                        fontFamily: 'monospace', color: 'white',
-                                    }}>
+
+                                <TableCell
+                                    sx={{
+                                        whiteSpace: 'nowrap',
+                                        backgroundColor: '#3a3a3a',
+                                        color: 'white'
+                                    }}
+                                >
+                                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
                                         {produto.gtin}
                                     </Typography>
                                 </TableCell>
-                                <TableCell align="right">
-                                    <Typography
-                                        variant="body2"
-                                        sx={{
-                                            fontWeight: 'bold',
-                                            color: '#1976d2'
-                                        }}
-                                    >
+
+                                <TableCell
+                                    align="right"
+                                    sx={{
+                                        whiteSpace: 'nowrap',
+                                        backgroundColor: '#3a3a3a',
+                                        color: 'white'
+                                    }}
+                                >
+                                    <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                                         {formatCurrency(produto.valorLoja)}
                                     </Typography>
                                 </TableCell>
+
                                 {uniqueCompetitors.map((competitor, colIndex) => {
                                     const valor = produto.competitorValues[competitor] || 0;
                                     const color = getPriceColor(produto.valorLoja, valor);
 
                                     return (
-                                        <TableCell key={colIndex} align="right">
+                                        <TableCell
+                                            key={colIndex}
+                                            align="right"
+                                            sx={{
+                                                whiteSpace: 'nowrap',
+                                                backgroundColor: '#3a3a3a',
+                                                color: 'white'
+                                            }}
+                                        >
                                             {valor > 0 ? (
-                                                <Typography
-                                                    variant="body2"
-                                                    sx={{
-                                                        fontWeight: 'bold',
-                                                        color: color
-                                                    }}
-                                                >
+                                                <Typography variant="body2" sx={{ fontWeight: 'bold', color }}>
                                                     {formatCurrency(valor)}
                                                 </Typography>
                                             ) : (

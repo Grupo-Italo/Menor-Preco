@@ -10,9 +10,9 @@ export function SearchGroups({ onDataFetched }) {
     const [selectedBase, setSelectedBase] = useState(null);
     const [selectedGrupo, setSelectedGrupo] = useState(null);
     const [selectedMarca, setSelectedMarca] = useState(null);
-    const [produtoData, setProdutoData] = useState([])
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
-    console.log('produtoData', produtoData);
+    console.log('Selected Marca:', selectedMarca);
+
     const showSnackbar = (message, severity = 'info') => {
         setSnackbar({ open: true, message, severity });
     };
@@ -57,16 +57,11 @@ export function SearchGroups({ onDataFetched }) {
                 grupoCodigo: selectedGrupo?.grup_codigo,
                 italoBasesId: selectedBase?.id,
                 cidade: selectedCidade?.cidade,
-                geohash: selectedBase?.geohash
+                geohash: selectedBase?.geohash,
+                marca: selectedMarca ? selectedMarca.marca : undefined
             }
         }
     );
-
-    useEffect(() => {
-        if (produtosData && produtosData.length > 0) {
-            setProdutoData(produtosData);
-        }
-    }, [produtosData]);
 
     const handleBuscar = async () => {
         if (!selectedCidade || !selectedBase || !selectedGrupo) {
@@ -74,13 +69,18 @@ export function SearchGroups({ onDataFetched }) {
             return;
         }
 
-        const result = await refetch(); // ✅ Agora funciona!
+        const result = await refetch();
 
-        if (onDataFetched && result.data) {
-            onDataFetched(result.data);
+        if (result.data && result.data.length > 0) {
+            showSnackbar('Dados carregados com sucesso!', 'success');
+            if (onDataFetched) {
+                onDataFetched(result.data);
+            }
+        } else if (result.data && result.data.length === 0) {
+            showSnackbar('Nenhum produto encontrado com concorrentes', 'warning');
         }
     };
-    
+
     return (
         <>
             <Backdrop open={loadingData || loadingBases || loadingCidades} sx={loadingStyles}>
